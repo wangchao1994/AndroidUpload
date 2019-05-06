@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".download.DownloadActivity">
+    <TextView
+        android:id="@+id/targetFolder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="下载路径文件夹:"/>
+
+    <Button
+        android:id="@+id/startAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="全部下载"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/download_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_download_list"/>
+</LinearLayout>

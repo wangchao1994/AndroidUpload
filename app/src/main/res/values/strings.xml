@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AndroidUpload</string>
+    <string name="simple_view_behavior">com.raisesail.andoid.androidupload.SimpleViewBehavior</string>
+</resources>

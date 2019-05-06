@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/upJson"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="上传Json数据"
+        android:textAllCaps="false"
+        android:onClick="simpleClick"/>
+
+    <Button
+        android:id="@+id/upString"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="上传String字符串"
+        android:textAllCaps="false"
+        android:onClick="simpleClick"/>
+
+    <Button
+        android:id="@+id/upBytes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="上传byte[]字节数组"
+        android:onClick="simpleClick"
+        android:textAllCaps="false"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/upFile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="上传单个文件"
+            android:onClick="simpleClick"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/selectImage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="选择图片（单选）"
+            android:onClick="simpleClick"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#888"
+        android:text="选择的图片路径"
+        android:textColor="#FFF"/>
+
+    <TextView
+        android:id="@+id/images"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="--"/>
+
+</LinearLayout>
