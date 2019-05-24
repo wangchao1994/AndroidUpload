@@ -31,11 +31,10 @@ public class GlobalApplication extends Application {
     public void setDefaultParams(){
         //set request header-------------------------
         HttpHeaders headers = new HttpHeaders();
-        headers.put("commonHeaderKey1", "commonHeaderValue1");
-        headers.put("commonHeaderKey2", "commonHeaderValue2");
-        HttpParams params = new HttpParams();
-        params.put("commonParamsKey1", "commonParamsValue1");
-        params.put("commonParamsKey2", "这里支持中文参数");
+        headers.put("X-API-KEY", "E6Y4GLtGdIBsMHIwlh7S2eOUKhJrTsr5A8x8UHH0");
+//        HttpParams params = new HttpParams();
+//        params.put("commonParamsKey1", "commonParamsValue1");
+//        params.put("commonParamsKey2", "这里支持中文参数");
         //set request header-------------------------
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -49,8 +48,8 @@ public class GlobalApplication extends Application {
         builder.writeTimeout(OkGo.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS);
         builder.connectTimeout(OkGo.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS);
         //证书验证
-        //HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory();//默认ssl认证
-        HttpsUtils.SSLParams currentSSLParams = getCurrentSSLParams();
+        HttpsUtils.SSLParams currentSSLParams = HttpsUtils.getSslSocketFactory();//默认ssl认证
+        //HttpsUtils.SSLParams currentSSLParams = getCurrentSSLParams();
         if (currentSSLParams != null){
             builder.sslSocketFactory(currentSSLParams.sSLSocketFactory, currentSSLParams.trustManager);
         }
@@ -61,17 +60,6 @@ public class GlobalApplication extends Application {
                 .setCacheMode(CacheMode.NO_CACHE)
                 .setCacheTime(CacheEntity.CACHE_NEVER_EXPIRE)
                 .setRetryCount(3)
-                .addCommonHeaders(headers)
-                .addCommonParams(params);
-    }
-
-    private HttpsUtils.SSLParams getCurrentSSLParams() {
-        try {
-            HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory(getAssets().open("srca.cer"));
-            return sslParams;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+                .addCommonHeaders(headers);
     }
 }
