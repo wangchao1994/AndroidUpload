@@ -1,10 +1,6 @@
 package com.raisesail.andoid.androidupload;
 
-import com.google.gson.annotations.SerializedName;
-
 public class RaiseData {
-
-
     /**
      * meta : {"additional information":"some data"}
      * name : image_03325512
@@ -50,15 +46,14 @@ public class RaiseData {
     }
 
     public static class MetaBean {
-        @SerializedName("additional information")
-        private String _$AdditionalInformation149; // FIXME check this code
 
-        public String get_$AdditionalInformation149() {
-            return _$AdditionalInformation149;
+        private String serialNumber;
+
+        public String getSerialNumber() {
+            return serialNumber;
         }
-
-        public void set_$AdditionalInformation149(String _$AdditionalInformation149) {
-            this._$AdditionalInformation149 = _$AdditionalInformation149;
+        public void setSerialNumber(String serialNumber) {
+            this.serialNumber = serialNumber;
         }
     }
 }

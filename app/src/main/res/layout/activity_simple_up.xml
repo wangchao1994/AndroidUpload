@@ -29,6 +29,20 @@
         android:onClick="simpleClick"
         android:textAllCaps="false"/>
 
+    <Button
+        android:id="@+id/download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="下载文件"
+        android:onClick="simpleClick"
+        android:textAllCaps="false"/>
+    <Button
+        android:id="@+id/upload_muti_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="上传多个文件"
+        android:onClick="simpleClick"
+        android:textAllCaps="false"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

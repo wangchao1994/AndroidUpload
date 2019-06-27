@@ -6,37 +6,47 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
-
+import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.okgo.OkGo;
-import com.raisesail.andoid.androidupload.bean.Data;
 import com.raisesail.andoid.androidupload.upload.GlideImageLoader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 public class SimpleUpActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(5*1000, TimeUnit.MILLISECONDS) //链接超时
+            .readTimeout(10*1000,TimeUnit.MILLISECONDS) //读取超时
+            .writeTimeout(10*1000,TimeUnit.MILLISECONDS) //写入超时
+            .addInterceptor(new UserAgentInterceptor())
+            .build();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +74,7 @@ public class SimpleUpActivity extends AppCompatActivity {
                 }).start();
                 break;
             case R.id.upString:
+                Toast.makeText(this,getSNString(),Toast.LENGTH_LONG).show();
                 break;
             case R.id.upBytes:
                 break;
@@ -72,10 +83,103 @@ public class SimpleUpActivity extends AppCompatActivity {
             case R.id.selectImage:
                 selectImage();
                 break;
+            case R.id.download:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        downAsynFile();
+                    }
+                }).start();
+                break;
+            case R.id.upload_muti_file:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                       uploadMutiFile();
+                    }
+                }).start();
+                break;
         }
     }
 
+    /**
+     * 上传多参数文件
+     */
+    private void uploadMutiFile() {
+        MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("title","rcs")
+                .addFormDataPart("image","rcs.jpg",RequestBody.create(MEDIA_TYPE_PNG,new File("/sdcard/rcs.jpg")))
+                .build();
+        Request request = new Request.Builder()
+                .addHeader("Content-Type","application/x-www-form-urlencoded")
+                .addHeader("X-API-KEY","E6Y4GLtGdIBsMHIwlh7S2eOUKhJrTsr5A8x8UHH0")
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+            }
+        });
+
+    }
+
+    /**
+     * 异步下载文件
+     */
+    private void downAsynFile() {
+        String url = "";
+        Request request = new Request.Builder()
+                .url(url).build();
+        Call newCall = okHttpClient.newCall(request);
+        newCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                ResponseBody body = response.body();
+                if (body == null)return;
+                InputStream inputStream = body.byteStream();
+                FileOutputStream mFileOutputStream;
+                try {
+                    mFileOutputStream = new FileOutputStream("path-------------->");//传入下载文件的路径
+                    byte[] buffer = new byte[2048];
+                    int len;
+                    while ((len = inputStream.read(buffer)) != -1){
+                        mFileOutputStream.write(buffer,0,len);
+                    }
+                    mFileOutputStream.flush();
+                    Log.d("wangchao_log","onResponse-download---------success->");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+    private ProgressDialog getGlobalDialog() {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getResources().getString(R.string.all_images));
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        return dialog;
+    }
+
     private void upJson() {
+        boolean connected = NetworkUtils.isNetworkConnected(this);
+        Log.d("request_code", "response-------connected------------------------->" + connected);
         //data bean
         final String json = getCurrentJsonDataForm();
         Log.d("request_code", "response-------upJson------------------------->" + json);
@@ -110,13 +214,6 @@ public class SimpleUpActivity extends AppCompatActivity {
                             Log.d("request_code","response-------onError-------->"+response.body());
                         }
                     });*/
-
-          OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(5*1000, TimeUnit.MILLISECONDS) //链接超时
-                .readTimeout(10*1000,TimeUnit.MILLISECONDS) //读取超时
-                .writeTimeout(10*1000,TimeUnit.MILLISECONDS) //写入超时
-                .addInterceptor(new UserAgentInterceptor())
-                .build();
             final RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
             final Request request = new Request.Builder()
                     .url(Urls.SERVER)
@@ -154,7 +251,6 @@ public class SimpleUpActivity extends AppCompatActivity {
         //boolean base64ToFile = Utils.base64ToFile(base64Pic, "/storage/emulated/0/124.jpg");
         //Log.d("request_code", "response-------base64ToFile------->" + base64ToFile);
     }
-
     class UserAgentInterceptor  implements Interceptor {
         @Override
         public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -171,12 +267,11 @@ public class SimpleUpActivity extends AppCompatActivity {
         RaiseData raiseData = new RaiseData();
         raiseData.setData(getBase64Pic());
         raiseData.setDataFormat("jpg");
-        raiseData.setName("123344444");
+        raiseData.setName("test_pic_number");
         RaiseData.MetaBean metaBean = new RaiseData.MetaBean();
-        metaBean.set_$AdditionalInformation149("some data");
+        metaBean.setSerialNumber(getSNString());
         raiseData.setMeta(metaBean);
-        String toJSONString = JSON.toJSONString(raiseData);
-        return toJSONString;
+        return JSON.toJSONString(raiseData);
     }
 
     public String getBase64Pic() {
@@ -186,25 +281,9 @@ public class SimpleUpActivity extends AppCompatActivity {
         opt.inInputShareable = true;
         InputStream is = this.getResources().openRawResource(R.mipmap.img);
         Bitmap bitmap = BitmapFactory.decodeStream(is, null, opt);
-        String bitmapToBase64 = Utils.bitmapToBase64(bitmap);
-        return bitmapToBase64;
+        return Utils.bitmapToBase64(bitmap);
     }
 
-    private String getCurrentJsonData() {
-        Data data = new Data();
-        String pathBase64String = Utils.imageToBase64("/storage/emulated/0/DCIM/Camera/201501070001/20150107224939.jpg");
-        Log.d("request_code", "response-------pathBase64String.length()-------->" + pathBase64String.length());
-        data.setData(pathBase64String);
-        data.setCreated(String.valueOf(SystemClock.elapsedRealtime()));
-        data.setDataFormat("jpg");
-        data.setName("name");
-        Data.MetaBean metaBean = new Data.MetaBean();
-        metaBean.setExtra("hospital");
-        metaBean.setThreshold(10);
-        data.setMeta(metaBean);
-        String toJSONString = JSON.toJSONString(data);
-        return toJSONString;
-    }
 
     public void selectImage() {
         ImagePicker imagePicker = ImagePicker.getInstance();
@@ -224,5 +303,17 @@ public class SimpleUpActivity extends AppCompatActivity {
         OkGo.getInstance().cancelTag(this);
     }
 
+    public String getSNString(){
+        String sn = "";
+        try {
+            Class<?> classZ = Class.forName("android.os.SystemProperties");
+            Method get = classZ.getMethod("get", String.class);
+            sn = (String) get.invoke(classZ, "ro.serialno");
+        }
+        catch (Exception e) {
+            Log.d("sn_string","getSNString-----"+e.getMessage());
+        }
+        return sn;
+    }
 
 }
