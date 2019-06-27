@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -150,13 +151,15 @@ public class SimpleUpActivity extends AppCompatActivity {
                 InputStream inputStream = body.byteStream();
                 FileOutputStream mFileOutputStream;
                 try {
-                    mFileOutputStream = new FileOutputStream("path-------------->");//传入下载文件的路径
+                    mFileOutputStream = new FileOutputStream(Environment.getExternalStorageDirectory()+File.separator+"rcs.jpg");//传入下载文件的路径
                     byte[] buffer = new byte[2048];
                     int len;
                     while ((len = inputStream.read(buffer)) != -1){
                         mFileOutputStream.write(buffer,0,len);
                     }
                     mFileOutputStream.flush();
+                    mFileOutputStream.close();
+                    inputStream.close();
                     Log.d("wangchao_log","onResponse-download---------success->");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
